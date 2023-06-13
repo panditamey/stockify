@@ -21,7 +21,11 @@ import { useState } from "react";
 // import Plot from 'react-plotly.js';
 import { parse } from 'json2csv';
 import flatten from "json2csv/transforms/flatten";
-var Plot = require('react-plotly.js').default;
+// var Plot = require('react-plotly.js').default;
+// import ReactApexChart from "react-apexcharts";
+// import { ApexOptions } from "apexcharts";
+import dynamic from 'next/dynamic';
+const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 
 
@@ -64,6 +68,41 @@ function Hero() {
     setUp(trend_upper)
     updateLoading(false);
   };
+
+  const options = {
+    chart: {
+      height: 350,
+      zoom: {
+        enabled: true
+      }
+    }
+  };
+
+  const series = [
+    {
+      name: "All Tasks",
+      data: [31, 40, 28, 51, 42, 109, 100]
+    },
+    {
+      name: "My Tasks",
+      data: [11, 32, 45, 32, 34, 52, 41]
+    }
+  ];
+
+  const options1 = {
+    chart: {
+      id: "basic-bar"
+    },
+    xaxis: {
+      categories: date
+    }
+  };
+  const series1= [
+    {
+      name: "series-1",
+      data: price
+    }
+  ]
   return (
     <>
       <Container mt={20}>
@@ -94,7 +133,7 @@ function Hero() {
             <option value='9'>9 Years</option>
             <option value='10'>10 Years</option>
           </Select>
-
+          {loading?null:
           <Button mb={5} onClick={(e) => {
             console.log("Clicked")
             if (years != null && prompt != null) {
@@ -121,6 +160,8 @@ function Hero() {
           }} colorScheme={"yellow"}>
             Generate
           </Button>
+          }
+          
         </Wrap>
 
         {loading ? (
@@ -131,7 +172,13 @@ function Hero() {
         ) : date ? (
           // "DATA LOADED SUCCESSFULLY"
           <>
-            <Plot
+          <ReactApexChart
+        type="line"
+        options={options1}
+        series={series1}
+        height={350}
+      />
+            {/* <Plot
               data={[
                 {
                   x: date,
@@ -178,7 +225,7 @@ function Hero() {
                 },
               ]}
               layout={{ width: window.innerWidth > 1000 ? window.innerWidth / 2 : window.innerWidth / 1.2, height: window.innerHeight / 2, title: `Histogram of ${Math.round(parseFloat(years) * 365)} days` }}
-            />
+            /> */}
           </>
         ) : null}
       </Container>
