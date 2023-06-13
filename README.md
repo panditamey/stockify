@@ -59,5 +59,4 @@ Stockify can be deployed using the following steps:
    - Sign up for an account on Hugging Face's Spaces (https://huggingface.co/) and create a new space.
    - Upload the backend code to the created space on Hugging Face's Spaces.
    - Follow the instructions provided by Hugging Face's Spaces to deploy the backend application.
-
 ##
