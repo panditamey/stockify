@@ -1,25 +1,24 @@
-# import yfinance as yf
-
-# msft = yf.Ticker("^NSEI")
-
-# # get stock info
-# print(msft.info)
-
-# # get historical market data
-# hist = msft.history(period="5d")
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 import yfinance as yf
 from datetime import datetime
 import pandas as pd
 from prophet import Prophet
+import json
+import numpy as np
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route('/stock_data', methods=['POST'])
+@cross_origin()
 def get_stock_data():
     data = request.get_json()
     stock_symbol = data['stock_symbol']
+    years = data['years']
+    period = float(years) * 365
     
     print(str(stock_symbol))
 
@@ -28,7 +27,7 @@ def get_stock_data():
         # # info = data.info.to_dict()
         # # data = data[["Date","Close"]]
         # print(data)
-        data = yf.download("ICICIBANK.BO", start="2015-01-01", end=datetime.now().strftime("%Y-%m-%d"))
+        data = yf.download(stock_symbol, start="2015-01-01", end=datetime.now().strftime("%Y-%m-%d"))
         data.to_csv
         df = pd.DataFrame(data=data)
         df.reset_index(inplace=True)
@@ -40,33 +39,34 @@ def get_stock_data():
         df = pd.DataFrame(data)
         print(df)
         df = df.rename(columns={"Date": "ds", "Data": "y"})
-        period = 2 * 365
 
         m = Prophet()
         m.fit(df)
-        future = m.make_future_dataframe(periods=period)
+        future = m.make_future_dataframe(periods=int(period))
         forecast = m.predict(future)
         print(forecast)
-
-        # print(date,data) 
-        # frames = [date, data]
-        # history = pd.concat(frames)
-        # print()
-        # date = date.to_dict()
-        # df = pd.DataFrame(forecast)
         forecast['ds'] = forecast['ds'].astype(str)
 
-        data = forecast.to_json(orient='records')
-
-        response = {
-            'data':data,
-            'success':1
-        }
+        #new code 
+        ds = [forecast['ds'].values][0]
+        yhat = [forecast['yhat'].values][0]
+        trend_lower = [forecast['trend_lower'].values][0]
+        trend_upper = [forecast['trend_upper'].values][0]
+        dsseries = pd.Series(ds).to_json(orient='values')
+        yhatseries = pd.Series(yhat).to_json(orient='values')
+        trend_lowerseries = pd.Series(trend_lower).to_json(orient='values')
+        trend_upperseries = pd.Series(trend_upper).to_json(orient='values')
+        history = json.dumps({
+            'dates': dsseries,
+            'prices': yhatseries,
+            'trend_lower':trend_lowerseries,
+            'trend_upper':trend_upperseries
+        })
     except Exception as e:
         response = {'error': str(e)}
 
-    return jsonify(response)
+    return history
+    # return jsonify(response)
 
-if __name__ == '__main__':
-    app.run()
-    # app.run(debug=False,host="0.0.0.0",port=5000)
+if __name__ =="__main__":
+    app.run(debug=False,host="0.0.0.0",port=5000)

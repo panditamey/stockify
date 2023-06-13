@@ -1,84 +1,124 @@
+"use client"
 import {
   ChakraProvider,
   Heading,
+  useToast,
   Container,
   // Text,
   Input,
   Button,
   Wrap,
-  Stack, 
+  Stack,
   Image,
   // Link,
   SkeletonCircle,
   SkeletonText,
+  Select
 } from "@chakra-ui/react";
 import React from 'react';
 import axios from "axios";
 import { useState } from "react";
-import Plot from 'react-plotly.js';
+// import Plot from 'react-plotly.js';
 import { parse } from 'json2csv';
+import flatten from "json2csv/transforms/flatten";
+var Plot = require('react-plotly.js').default;
+
 
 
 
 function Hero() {
-    const [prompt, updatePrompt] = useState<any | null>(null);
-    const [data, setData] = useState<any | null>(null);
-    const [loading, updateLoading] = useState<any | null>(null);
+  const [prompt, updatePrompt] = useState<any | null>(null);
+  const [years, setYears] = useState<any | null>(null);
+  const [date, setDate] = useState<any | []>(null);
+  const [price, setPrices] = useState<any | []>(null);
+  const [trend_lower, setLow] = useState<any | []>(null);
+  const [trend_upper, setUp] = useState<any | []>(null);
+  const [loading, updateLoading] = useState<any | null>(null);
+  const toast = useToast()
 
 
 
-    const generate = async () => {
-      updateLoading(true);
-        const result = await axios.post('https://panditamey-stockify-back.hf.space/stock_data', { "stock_symbol":"ICICIBANK.BO" });
-        console.log(result.data)
-        const csv = parse(result.data,{delimiter: ' ', header: true });
-        console.log(csv);
-        setData(result.data);
-        updateLoading(false);
-    };
-
-    var trace1 = {
-      x: [1, 2, 3, 4],
-      y: [10, 15, 13, 17],
-      mode: 'markers',
-      name: 'Scatter'
-    };
-    
-    var trace2 = {
-      x: [2, 3, 4, 5],
-      y: [16, 5, 11, 9],
-      mode: 'lines',
-      name: 'Lines'
-    };
-    
-    var trace3 = {
-      x: [1, 2, 3, 4],
-      y: [12, 9, 15, 12],
-      mode: 'lines+markers',
-      name: 'Scatter + Lines'
-    };
-    
-    var dataa = [ trace1, trace2, trace3 ];
-    
-    var layout = {
-      title:'Adding Names to Line and Scatter Plot'
-    };
-    return (
-        <>
-        <Container>
-        <Heading>Stable Diffusion</Heading>
+  const generate = async (prompt: any) => {
+    updateLoading(true);
+    const result = await axios.post('https://panditamey-stockify-back.hf.space/stock_data',
+      {
+        "stock_symbol": prompt,
+        "years": years
+      }
+    );
+    var dates = result.data["dates"]
+    var prices = result.data["prices"]
+    var trend_lower = result.data["trend_lower"]
+    var trend_upper = result.data["trend_upper"]
+    dates = dates.replace(/'/g, '"');
+    dates = JSON.parse(dates);
+    prices = prices.replace(/'/g, '"');
+    prices = JSON.parse(prices);
+    trend_lower = trend_lower.replace(/'/g, '"');
+    trend_lower = JSON.parse(trend_lower);
+    trend_upper = trend_upper.replace(/'/g, '"');
+    trend_upper = JSON.parse(trend_upper);
+    setDate(dates)
+    setPrices(prices)
+    setLow(trend_lower)
+    setUp(trend_upper)
+    updateLoading(false);
+  };
+  return (
+    <>
+      <Container mt={20}>
+        <Heading mb={5}>Enter Stock Symbol</Heading>
 
 
-        <Wrap marginBottom={"10px"}>
-          <Input
+        <Wrap >
+          <Input mb={5}
             value={prompt}
+            placeholder="ICICIBANK.BO"
             onChange={(e) => updatePrompt(e.target.value)}
             width={"768px"}
           ></Input>
-          <Button onClick={(e) => {
+
+
+          <Select mb={5} placeholder='Years Of Prediction' onChange={(e) => { setDate(null); setYears(e.target.value) }}>
+            <option value='0.0168'>1 Week</option>
+            <option value='0.084'>1 Month</option>
+            <option value='0.504'>6 Month</option>
+            <option value='1'>1 Year</option>
+            <option value='2'>2 Years</option>
+            <option value='3'>3 Years</option>
+            <option value='4'>4 Years</option>
+            <option value='5'>5 Years</option>
+            <option value='6'>6 Years</option>
+            <option value='7'>7 Years</option>
+            <option value='8'>8 Years</option>
+            <option value='9'>9 Years</option>
+            <option value='10'>10 Years</option>
+          </Select>
+
+          <Button mb={5} onClick={(e) => {
             console.log("Clicked")
-            generate();
-            }} colorScheme={"yellow"}>
+            if (years != null && prompt != null) {
+              generate(prompt);
+            }
+            else if (prompt == null) {
+              toast({
+                title: 'Enter Stock Symbol',
+                status: 'warning',
+                duration: 5000,
+                isClosable: false,
+              })
+            }
+            else {
+              toast({
+                title: 'Kindly Select Years Of Prediction',
+                status: 'warning',
+                duration: 5000,
+                isClosable: false,
+              })
+            }
+
+            console.log(years)
+          }} colorScheme={"yellow"}>
             Generate
           </Button>
         </Wrap>
@@ -88,23 +128,62 @@ function Hero() {
             <SkeletonCircle />
             <SkeletonText />
           </Stack>
-        ) : data ? (
+        ) : date ? (
           // "DATA LOADED SUCCESSFULLY"
-          <Plot
-        data={[
-          {
-            x: [1, 2, 3],
-            y: [2, 6, 3],
-            type: 'scatter',
-            marker: {color: 'red'},
-          },
-        ]}
-        layout={{width: 320, height: 240, title: 'A Fancy Plot'}}
-      />
+          <>
+            <Plot
+              data={[
+                {
+                  x: date,
+                  y: price,
+                  type: 'scatter',
+                  marker: { color: 'blue' },
+                },
+              ]}
+              layout={{ width: window.innerWidth > 1000 ? window.innerWidth / 2 : window.innerWidth / 1.2, height: window.innerHeight / 2, title: `Forecasted data ${Math.round(parseFloat(years) * 365)} days` }}
+            />
+
+            <Plot
+              data={[
+                {
+                  x: date,
+                  y: trend_lower,
+                  mode: 'scatter',
+                  autorange: false,
+                  marker: { color: 'blue' },
+                },
+              ]}
+              layout={{ width: window.innerWidth > 1000 ? window.innerWidth / 2 : window.innerWidth / 1.2, height: window.innerHeight / 2, title: `Possible Low Trends ${Math.round(parseFloat(years) * 365)} days` }}
+            />
+
+            <Plot
+              data={[
+                {
+                  x: date,
+                  y: trend_upper,
+                  mode: 'scatter',
+                  autorange: false,
+                  marker: { color: 'blue' },
+                },
+              ]}
+              layout={{ width: window.innerWidth > 1000 ? window.innerWidth / 2 : window.innerWidth / 1.2, height: window.innerHeight / 2, title: `Possible High Trends ${Math.round(parseFloat(years) * 365)} days` }}
+            />
+            <Plot
+              data={[
+                {
+                  x: date,
+                  y: price,
+                  type: 'histogram',
+                  marker: { color: 'blue' },
+                },
+              ]}
+              layout={{ width: window.innerWidth > 1000 ? window.innerWidth / 2 : window.innerWidth / 1.2, height: window.innerHeight / 2, title: `Histogram of ${Math.round(parseFloat(years) * 365)} days` }}
+            />
+          </>
         ) : null}
       </Container>
-        </>
-    )
+    </>
+  )
 }
 
 export default Hero

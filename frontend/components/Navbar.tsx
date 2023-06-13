@@ -16,6 +16,7 @@ import {
   Stack,
   useColorMode,
   Center,
+  Text
 } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
@@ -40,7 +41,7 @@ export default function NavBar() {
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
-          <Box>Stockify</Box>
+        <Text fontSize='xl'  as='b'>Stockify</Text>
 
           <Flex alignItems={'center'}>
             <Stack direction={'row'} spacing={7}>
@@ -48,7 +49,7 @@ export default function NavBar() {
                 {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
               </Button>
 
-              <Menu>
+              {/* <Menu>
                 <MenuButton
                   as={Button}
                   rounded={'full'}
@@ -78,7 +79,7 @@ export default function NavBar() {
                   <MenuItem>Account Settings</MenuItem>
                   <MenuItem>Logout</MenuItem>
                 </MenuList>
-              </Menu>
+              </Menu> */}
             </Stack>
           </Flex>
         </Flex>
