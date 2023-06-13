@@ -18,7 +18,9 @@ import {
   Center,
   Text
 } from '@chakra-ui/react';
-import { MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { MoonIcon, SunIcon} from '@chakra-ui/icons';
+import { AiFillGithub } from 'react-icons/ai';
+
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
@@ -47,6 +49,9 @@ export default function NavBar() {
             <Stack direction={'row'} spacing={7}>
               <Button onClick={toggleColorMode}>
                 {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+              </Button>
+              <Button as={"a"} href='https://github.com/panditamey/stockify'>
+                {colorMode === 'light' ? <AiFillGithub /> : <AiFillGithub />}
               </Button>
 
               {/* <Menu>
