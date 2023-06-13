@@ -13,7 +13,8 @@ import {
   // Link,
   SkeletonCircle,
   SkeletonText,
-  Select
+  Select,
+  Text
 } from "@chakra-ui/react";
 import React from 'react';
 import axios from "axios";
@@ -69,26 +70,6 @@ function Hero() {
     updateLoading(false);
   };
 
-  const options = {
-    chart: {
-      height: 350,
-      zoom: {
-        enabled: true
-      }
-    }
-  };
-
-  const series = [
-    {
-      name: "All Tasks",
-      data: [31, 40, 28, 51, 42, 109, 100]
-    },
-    {
-      name: "My Tasks",
-      data: [11, 32, 45, 32, 34, 52, 41]
-    }
-  ];
-
   const options1 = {
     chart: {
       id: "basic-bar"
@@ -97,9 +78,51 @@ function Hero() {
       categories: date
     }
   };
-  const series1= [
+  const series1 = [
     {
-      name: "series-1",
+      name: "price",
+      data: price
+    }
+  ]
+  const options2 = {
+    chart: {
+      id: "basic-bar"
+    },
+    xaxis: {
+      categories: date
+    }
+  };
+  const series2 = [
+    {
+      name: "lowest",
+      data: trend_lower
+    }
+  ]
+  const options3 = {
+    chart: {
+      id: "basic-bar"
+    },
+    xaxis: {
+      categories: date
+    }
+  };
+  const series3 = [
+    {
+      name: "highest",
+      data: trend_upper
+    }
+  ]
+  const options4 = {
+    chart: {
+      id: "basic-bar"
+    },
+    xaxis: {
+      categories: date
+    }
+  };
+  const series4 = [
+    {
+      name: "price",
       data: price
     }
   ]
@@ -133,35 +156,35 @@ function Hero() {
             <option value='9'>9 Years</option>
             <option value='10'>10 Years</option>
           </Select>
-          {loading?null:
-          <Button mb={5} onClick={(e) => {
-            console.log("Clicked")
-            if (years != null && prompt != null) {
-              generate(prompt);
-            }
-            else if (prompt == null) {
-              toast({
-                title: 'Enter Stock Symbol',
-                status: 'warning',
-                duration: 5000,
-                isClosable: false,
-              })
-            }
-            else {
-              toast({
-                title: 'Kindly Select Years Of Prediction',
-                status: 'warning',
-                duration: 5000,
-                isClosable: false,
-              })
-            }
+          {loading ? null :
+            <Button mb={5} onClick={(e) => {
+              console.log("Clicked")
+              if (years != null && prompt != null) {
+                generate(prompt);
+              }
+              else if (prompt == null) {
+                toast({
+                  title: 'Enter Stock Symbol',
+                  status: 'warning',
+                  duration: 5000,
+                  isClosable: false,
+                })
+              }
+              else {
+                toast({
+                  title: 'Kindly Select Years Of Prediction',
+                  status: 'warning',
+                  duration: 5000,
+                  isClosable: false,
+                })
+              }
 
-            console.log(years)
-          }} colorScheme={"yellow"}>
-            Generate
-          </Button>
+              console.log(years)
+            }} colorScheme={"yellow"}>
+              Generate
+            </Button>
           }
-          
+
         </Wrap>
 
         {loading ? (
@@ -172,59 +195,33 @@ function Hero() {
         ) : date ? (
           // "DATA LOADED SUCCESSFULLY"
           <>
-          <ReactApexChart
-        type="line"
-        options={options1}
-        series={series1}
-        height={350}
-      />
-            {/* <Plot
-              data={[
-                {
-                  x: date,
-                  y: price,
-                  type: 'scatter',
-                  marker: { color: 'blue' },
-                },
-              ]}
-              layout={{ width: window.innerWidth > 1000 ? window.innerWidth / 2 : window.innerWidth / 1.2, height: window.innerHeight / 2, title: `Forecasted data ${Math.round(parseFloat(years) * 365)} days` }}
+          <Text fontSize='xl'  as='b'>Forecasted data {Math.round(parseFloat(years) * 365)} days</Text>
+            <ReactApexChart
+              type="line"
+              options={options1}
+              series={series1}
+              height={350}
             />
-
-            <Plot
-              data={[
-                {
-                  x: date,
-                  y: trend_lower,
-                  mode: 'scatter',
-                  autorange: false,
-                  marker: { color: 'blue' },
-                },
-              ]}
-              layout={{ width: window.innerWidth > 1000 ? window.innerWidth / 2 : window.innerWidth / 1.2, height: window.innerHeight / 2, title: `Possible Low Trends ${Math.round(parseFloat(years) * 365)} days` }}
+            <Text fontSize='xl'  as='b'>Possible Low Trends of {Math.round(parseFloat(years) * 365)} days</Text>
+            <ReactApexChart
+              type="line"
+              options={options2}
+              series={series2}
+              height={350}
             />
-
-            <Plot
-              data={[
-                {
-                  x: date,
-                  y: trend_upper,
-                  mode: 'scatter',
-                  autorange: false,
-                  marker: { color: 'blue' },
-                },
-              ]}
-              layout={{ width: window.innerWidth > 1000 ? window.innerWidth / 2 : window.innerWidth / 1.2, height: window.innerHeight / 2, title: `Possible High Trends ${Math.round(parseFloat(years) * 365)} days` }}
+            <Text fontSize='xl'  as='b'>Possible Low Trends of {Math.round(parseFloat(years) * 365)} days</Text>
+            <ReactApexChart
+              type="line"
+              options={options3}
+              series={series3}
+              height={350}
             />
-            <Plot
-              data={[
-                {
-                  x: date,
-                  y: price,
-                  type: 'histogram',
-                  marker: { color: 'blue' },
-                },
-              ]}
-              layout={{ width: window.innerWidth > 1000 ? window.innerWidth / 2 : window.innerWidth / 1.2, height: window.innerHeight / 2, title: `Histogram of ${Math.round(parseFloat(years) * 365)} days` }}
+            {/* <Text fontSize='xl'  as='b'>Forecasted Histogram of {Math.round(parseFloat(years) * 365)} days</Text> */}
+            {/* <ReactApexChart
+              type="bar"
+              options={options1}
+              series={series1}
+              height={350}
             /> */}
           </>
         ) : null}
