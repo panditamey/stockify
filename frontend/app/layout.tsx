@@ -25,8 +25,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="apple-touch-icon" href="public/next.svg"/>
-        <link rel="icon" type="image/x-icon" href="public/next.svg"/>
+        <link rel="apple-touch-icon" href="public/stock.png"/>
+        <link rel="icon" type="image/x-icon" href="public/stock.png"/>
         <title>Stockify</title>
       </head>
       <body className={inter.className}>
