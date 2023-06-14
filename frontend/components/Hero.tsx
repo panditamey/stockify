@@ -209,7 +209,7 @@ function Hero() {
               series={series2}
               height={350}
             />
-            <Text fontSize='xl'  as='b'>Possible Low Trends of {Math.round(parseFloat(years) * 365)} days</Text>
+            <Text fontSize='xl'  as='b'>Possible High Trends of {Math.round(parseFloat(years) * 365)} days</Text>
             <ReactApexChart
               type="line"
               options={options3}
